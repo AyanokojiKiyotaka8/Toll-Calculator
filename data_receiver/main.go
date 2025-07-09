@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -10,18 +9,33 @@ import (
 )
 
 func main() {
-	fmt.Println("running receiver")
-	dr := NewDataReceiver()
+	dr, err := NewDataReceiver()
+	if err != nil {
+		log.Fatal(err)
+	}
 	http.HandleFunc("/ws", dr.handleWs)
 	http.ListenAndServe(":30000", nil)
 }
 
 type DataReceiver struct {
 	conn *websocket.Conn
+	prod DataProducer
 }
 
-func NewDataReceiver() *DataReceiver {
-	return &DataReceiver{}
+func NewDataReceiver() (*DataReceiver, error) {
+	var (
+		p          DataProducer
+		err        error
+		kafkaTopic = "obudata"
+	)
+	p, err = NewKafkaDataProducer(kafkaTopic)
+	if err != nil {
+		return nil, err
+	}
+	p = NewLogMiddleware(p)
+	return &DataReceiver{
+		prod: p,
+	}, nil
 }
 
 func (dr *DataReceiver) handleWs(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +48,12 @@ func (dr *DataReceiver) handleWs(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	dr.conn = conn
+
 	go dr.wsReceiveLoop()
+}
+
+func (dr *DataReceiver) produceData(data *types.OBUData) error {
+	return dr.prod.ProduceData(data)
 }
 
 func (dr *DataReceiver) wsReceiveLoop() {
@@ -44,6 +63,8 @@ func (dr *DataReceiver) wsReceiveLoop() {
 			log.Println("read error: ", err)
 			continue
 		}
-		fmt.Println(data)
+		if err := dr.produceData(&data); err != nil {
+			log.Println("produce error: ", err)
+		}
 	}
 }
