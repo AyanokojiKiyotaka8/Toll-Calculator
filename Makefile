@@ -6,7 +6,7 @@ receiver:
 	@go build -o bin/receiver ./data_receiver
 	@./bin/receiver
 
-calculator:
+calc:
 	@go build -o bin/calculator ./distance_calculator
 	@./bin/calculator
 
@@ -14,4 +14,4 @@ agg:
 	@go build -o bin/agg ./aggregator
 	@./bin/agg
 
-.PHONY: obu receiver calculator agg
+.PHONY: obu receiver calc agg
