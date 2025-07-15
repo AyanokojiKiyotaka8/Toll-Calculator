@@ -14,7 +14,14 @@ agg:
 	@go build -o bin/agg ./aggregator
 	@./bin/agg
 
+PROTOC_GEN_GO := $(shell go env GOPATH)/bin/protoc-gen-go
+PROTOC_GEN_GRPC := $(shell go env GOPATH)/bin/protoc-gen-go-grpc
+
 proto:
-	protoc --go_out=. --go_opt=paths=source_relative types/ptypes.proto
+	@protoc --plugin=protoc-gen-go=$(PROTOC_GEN_GO) \
+	       --plugin=protoc-gen-go-grpc=$(PROTOC_GEN_GRPC) \
+	       --go_out=. --go_opt=paths=source_relative \
+	       --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+	       types/ptypes.proto
 
 .PHONY: obu receiver calc agg

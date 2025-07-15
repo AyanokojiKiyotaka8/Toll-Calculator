@@ -24,6 +24,7 @@ const (
 type Test struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Someint       int32                  `protobuf:"varint,1,opt,name=someint,proto3" json:"someint,omitempty"`
+	Someint2      int32                  `protobuf:"varint,2,opt,name=someint2,proto3" json:"someint2,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -65,13 +66,115 @@ func (x *Test) GetSomeint() int32 {
 	return 0
 }
 
+func (x *Test) GetSomeint2() int32 {
+	if x != nil {
+		return x.Someint2
+	}
+	return 0
+}
+
+type Resp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Resp) Reset() {
+	*x = Resp{}
+	mi := &file_types_ptypes_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Resp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Resp) ProtoMessage() {}
+
+func (x *Resp) ProtoReflect() protoreflect.Message {
+	mi := &file_types_ptypes_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Resp.ProtoReflect.Descriptor instead.
+func (*Resp) Descriptor() ([]byte, []int) {
+	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Resp) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type Req struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Num           string                 `protobuf:"bytes,1,opt,name=num,proto3" json:"num,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Req) Reset() {
+	*x = Req{}
+	mi := &file_types_ptypes_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Req) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Req) ProtoMessage() {}
+
+func (x *Req) ProtoReflect() protoreflect.Message {
+	mi := &file_types_ptypes_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Req.ProtoReflect.Descriptor instead.
+func (*Req) Descriptor() ([]byte, []int) {
+	return file_types_ptypes_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Req) GetNum() string {
+	if x != nil {
+		return x.Num
+	}
+	return ""
+}
+
 var File_types_ptypes_proto protoreflect.FileDescriptor
 
 const file_types_ptypes_proto_rawDesc = "" +
 	"\n" +
-	"\x12types/ptypes.proto\" \n" +
+	"\x12types/ptypes.proto\"<\n" +
 	"\x04Test\x12\x18\n" +
-	"\asomeint\x18\x01 \x01(\x05R\asomeintB5Z3github.com/AyanokojiKiyotaka8/Toll-Calculator/typesb\x06proto3"
+	"\asomeint\x18\x01 \x01(\x05R\asomeint\x12\x1a\n" +
+	"\bsomeint2\x18\x02 \x01(\x05R\bsomeint2\"\x16\n" +
+	"\x04Resp\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x17\n" +
+	"\x03Req\x12\x10\n" +
+	"\x03num\x18\x01 \x01(\tR\x03num2#\n" +
+	"\x03App\x12\x1c\n" +
+	"\aGetUser\x12\x04.Req\x1a\x05.Resp\"\x00(\x010\x01B5Z3github.com/AyanokojiKiyotaka8/Toll-Calculator/typesb\x06proto3"
 
 var (
 	file_types_ptypes_proto_rawDescOnce sync.Once
@@ -85,13 +188,17 @@ func file_types_ptypes_proto_rawDescGZIP() []byte {
 	return file_types_ptypes_proto_rawDescData
 }
 
-var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_types_ptypes_proto_goTypes = []any{
 	(*Test)(nil), // 0: Test
+	(*Resp)(nil), // 1: Resp
+	(*Req)(nil),  // 2: Req
 }
 var file_types_ptypes_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
+	2, // 0: App.GetUser:input_type -> Req
+	1, // 1: App.GetUser:output_type -> Resp
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -108,9 +215,9 @@ func file_types_ptypes_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_ptypes_proto_rawDesc), len(file_types_ptypes_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   3,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
 		GoTypes:           file_types_ptypes_proto_goTypes,
 		DependencyIndexes: file_types_ptypes_proto_depIdxs,
