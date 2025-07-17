@@ -14,3 +14,5 @@ message Req { string num = 1; }
 service App {
   rpc GetUser(stream Req) returns (stream Resp) {};
 }
+
+// for bidirectional stream oneof will be great
