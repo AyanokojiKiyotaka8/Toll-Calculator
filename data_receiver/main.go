@@ -6,6 +6,7 @@ import (
 
 	"github.com/AyanokojiKiyotaka8/Toll-Calculator/types"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -13,6 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	logrus.Info("kafka producer started")
 	http.HandleFunc("/ws", dr.handleWs)
 	http.ListenAndServe(":30000", nil)
 }

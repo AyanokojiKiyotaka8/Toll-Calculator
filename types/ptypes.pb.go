@@ -21,28 +21,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Test struct {
+type AggregatorReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Someint       int32                  `protobuf:"varint,1,opt,name=someint,proto3" json:"someint,omitempty"`
-	Someint2      int32                  `protobuf:"varint,2,opt,name=someint2,proto3" json:"someint2,omitempty"`
+	ObuId         int64                  `protobuf:"varint,1,opt,name=obu_id,json=obuId,proto3" json:"obu_id,omitempty"`
+	Value         float64                `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
+	Unix          int64                  `protobuf:"varint,3,opt,name=unix,proto3" json:"unix,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Test) Reset() {
-	*x = Test{}
+func (x *AggregatorReq) Reset() {
+	*x = AggregatorReq{}
 	mi := &file_types_ptypes_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Test) String() string {
+func (x *AggregatorReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Test) ProtoMessage() {}
+func (*AggregatorReq) ProtoMessage() {}
 
-func (x *Test) ProtoReflect() protoreflect.Message {
+func (x *AggregatorReq) ProtoReflect() protoreflect.Message {
 	mi := &file_types_ptypes_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,46 +55,52 @@ func (x *Test) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Test.ProtoReflect.Descriptor instead.
-func (*Test) Descriptor() ([]byte, []int) {
+// Deprecated: Use AggregatorReq.ProtoReflect.Descriptor instead.
+func (*AggregatorReq) Descriptor() ([]byte, []int) {
 	return file_types_ptypes_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Test) GetSomeint() int32 {
+func (x *AggregatorReq) GetObuId() int64 {
 	if x != nil {
-		return x.Someint
+		return x.ObuId
 	}
 	return 0
 }
 
-func (x *Test) GetSomeint2() int32 {
+func (x *AggregatorReq) GetValue() float64 {
 	if x != nil {
-		return x.Someint2
+		return x.Value
 	}
 	return 0
 }
 
-type Resp struct {
+func (x *AggregatorReq) GetUnix() int64 {
+	if x != nil {
+		return x.Unix
+	}
+	return 0
+}
+
+type AggregatorResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *Resp) Reset() {
-	*x = Resp{}
+func (x *AggregatorResp) Reset() {
+	*x = AggregatorResp{}
 	mi := &file_types_ptypes_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Resp) String() string {
+func (x *AggregatorResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Resp) ProtoMessage() {}
+func (*AggregatorResp) ProtoMessage() {}
 
-func (x *Resp) ProtoReflect() protoreflect.Message {
+func (x *AggregatorResp) ProtoReflect() protoreflect.Message {
 	mi := &file_types_ptypes_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -105,76 +112,24 @@ func (x *Resp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Resp.ProtoReflect.Descriptor instead.
-func (*Resp) Descriptor() ([]byte, []int) {
+// Deprecated: Use AggregatorResp.ProtoReflect.Descriptor instead.
+func (*AggregatorResp) Descriptor() ([]byte, []int) {
 	return file_types_ptypes_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Resp) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type Req struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Num           string                 `protobuf:"bytes,1,opt,name=num,proto3" json:"num,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Req) Reset() {
-	*x = Req{}
-	mi := &file_types_ptypes_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Req) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Req) ProtoMessage() {}
-
-func (x *Req) ProtoReflect() protoreflect.Message {
-	mi := &file_types_ptypes_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Req.ProtoReflect.Descriptor instead.
-func (*Req) Descriptor() ([]byte, []int) {
-	return file_types_ptypes_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *Req) GetNum() string {
-	if x != nil {
-		return x.Num
-	}
-	return ""
 }
 
 var File_types_ptypes_proto protoreflect.FileDescriptor
 
 const file_types_ptypes_proto_rawDesc = "" +
 	"\n" +
-	"\x12types/ptypes.proto\"<\n" +
-	"\x04Test\x12\x18\n" +
-	"\asomeint\x18\x01 \x01(\x05R\asomeint\x12\x1a\n" +
-	"\bsomeint2\x18\x02 \x01(\x05R\bsomeint2\"\x16\n" +
-	"\x04Resp\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x17\n" +
-	"\x03Req\x12\x10\n" +
-	"\x03num\x18\x01 \x01(\tR\x03num2#\n" +
-	"\x03App\x12\x1c\n" +
-	"\aGetUser\x12\x04.Req\x1a\x05.Resp\"\x00(\x010\x01B5Z3github.com/AyanokojiKiyotaka8/Toll-Calculator/typesb\x06proto3"
+	"\x12types/ptypes.proto\"P\n" +
+	"\rAggregatorReq\x12\x15\n" +
+	"\x06obu_id\x18\x01 \x01(\x03R\x05obuId\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x01R\x05value\x12\x12\n" +
+	"\x04unix\x18\x03 \x01(\x03R\x04unix\"\x10\n" +
+	"\x0eAggregatorResp2<\n" +
+	"\n" +
+	"Aggregator\x12.\n" +
+	"\tAggregate\x12\x0e.AggregatorReq\x1a\x0f.AggregatorResp\"\x00B5Z3github.com/AyanokojiKiyotaka8/Toll-Calculator/typesb\x06proto3"
 
 var (
 	file_types_ptypes_proto_rawDescOnce sync.Once
@@ -188,15 +143,14 @@ func file_types_ptypes_proto_rawDescGZIP() []byte {
 	return file_types_ptypes_proto_rawDescData
 }
 
-var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_types_ptypes_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_types_ptypes_proto_goTypes = []any{
-	(*Test)(nil), // 0: Test
-	(*Resp)(nil), // 1: Resp
-	(*Req)(nil),  // 2: Req
+	(*AggregatorReq)(nil),  // 0: AggregatorReq
+	(*AggregatorResp)(nil), // 1: AggregatorResp
 }
 var file_types_ptypes_proto_depIdxs = []int32{
-	2, // 0: App.GetUser:input_type -> Req
-	1, // 1: App.GetUser:output_type -> Resp
+	0, // 0: Aggregator.Aggregate:input_type -> AggregatorReq
+	1, // 1: Aggregator.Aggregate:output_type -> AggregatorResp
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -215,7 +169,7 @@ func file_types_ptypes_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_types_ptypes_proto_rawDesc), len(file_types_ptypes_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

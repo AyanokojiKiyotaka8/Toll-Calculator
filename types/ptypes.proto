@@ -2,17 +2,14 @@ syntax = "proto3";
 
 option go_package = "github.com/AyanokojiKiyotaka8/Toll-Calculator/types";
 
-message Test {
-  int32 someint = 1;
-  int32 someint2 = 2;
+message AggregatorReq {
+  int64 obu_id = 1;
+  double value = 2;
+  int64 unix = 3;
 }
 
-message Resp { string id = 1; }
+message AggregatorResp {}
 
-message Req { string num = 1; }
-
-service App {
-  rpc GetUser(stream Req) returns (stream Resp) {};
+service Aggregator {
+  rpc Aggregate(AggregatorReq) returns (AggregatorResp) {};
 }
-
-// for bidirectional stream oneof will be great

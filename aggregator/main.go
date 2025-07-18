@@ -3,10 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 	"strconv"
 
 	"github.com/AyanokojiKiyotaka8/Toll-Calculator/types"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -14,11 +17,30 @@ func main() {
 	store := NewMemoryStore()
 	svc = NewInvoiceAggregator(store)
 	svc = NewLogMiddleware(svc)
+
+	go makeGRPCTransport(svc, ":3001")
 	makeHTTPTransport(svc, ":3000")
 }
 
+func makeGRPCTransport(svc Aggregator, listenAddress string) {
+	fmt.Println("starting GRPC Transport on port", listenAddress)
+	aggServer := NewGRPCAggregatorServer(svc)
+	grpcServer := grpc.NewServer()
+	types.RegisterAggregatorServer(grpcServer, aggServer)
+
+	l, err := net.Listen("tcp", listenAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer l.Close()
+	err = grpcServer.Serve(l)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func makeHTTPTransport(svc Aggregator, listenAddress string) {
-	fmt.Println("starting HTTP Transport")
+	fmt.Println("starting HTTP Transport on port", listenAddress)
 	http.HandleFunc("/aggregate", handleAggregateDistance(svc))
 	http.HandleFunc("/invoice", handleGetInvoice(svc))
 	http.ListenAndServe(listenAddress, nil)

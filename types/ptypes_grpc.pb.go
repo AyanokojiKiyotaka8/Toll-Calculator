@@ -19,97 +19,103 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	App_GetUser_FullMethodName = "/App/GetUser"
+	Aggregator_Aggregate_FullMethodName = "/Aggregator/Aggregate"
 )
 
-// AppClient is the client API for App service.
+// AggregatorClient is the client API for Aggregator service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AppClient interface {
-	GetUser(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Req, Resp], error)
+type AggregatorClient interface {
+	Aggregate(ctx context.Context, in *AggregatorReq, opts ...grpc.CallOption) (*AggregatorResp, error)
 }
 
-type appClient struct {
+type aggregatorClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAppClient(cc grpc.ClientConnInterface) AppClient {
-	return &appClient{cc}
+func NewAggregatorClient(cc grpc.ClientConnInterface) AggregatorClient {
+	return &aggregatorClient{cc}
 }
 
-func (c *appClient) GetUser(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Req, Resp], error) {
+func (c *aggregatorClient) Aggregate(ctx context.Context, in *AggregatorReq, opts ...grpc.CallOption) (*AggregatorResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &App_ServiceDesc.Streams[0], App_GetUser_FullMethodName, cOpts...)
+	out := new(AggregatorResp)
+	err := c.cc.Invoke(ctx, Aggregator_Aggregate_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Req, Resp]{ClientStream: stream}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type App_GetUserClient = grpc.BidiStreamingClient[Req, Resp]
-
-// AppServer is the server API for App service.
-// All implementations must embed UnimplementedAppServer
+// AggregatorServer is the server API for Aggregator service.
+// All implementations must embed UnimplementedAggregatorServer
 // for forward compatibility.
-type AppServer interface {
-	GetUser(grpc.BidiStreamingServer[Req, Resp]) error
-	mustEmbedUnimplementedAppServer()
+type AggregatorServer interface {
+	Aggregate(context.Context, *AggregatorReq) (*AggregatorResp, error)
+	mustEmbedUnimplementedAggregatorServer()
 }
 
-// UnimplementedAppServer must be embedded to have
+// UnimplementedAggregatorServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedAppServer struct{}
+type UnimplementedAggregatorServer struct{}
 
-func (UnimplementedAppServer) GetUser(grpc.BidiStreamingServer[Req, Resp]) error {
-	return status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+func (UnimplementedAggregatorServer) Aggregate(context.Context, *AggregatorReq) (*AggregatorResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Aggregate not implemented")
 }
-func (UnimplementedAppServer) mustEmbedUnimplementedAppServer() {}
-func (UnimplementedAppServer) testEmbeddedByValue()             {}
+func (UnimplementedAggregatorServer) mustEmbedUnimplementedAggregatorServer() {}
+func (UnimplementedAggregatorServer) testEmbeddedByValue()                    {}
 
-// UnsafeAppServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AppServer will
+// UnsafeAggregatorServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AggregatorServer will
 // result in compilation errors.
-type UnsafeAppServer interface {
-	mustEmbedUnimplementedAppServer()
+type UnsafeAggregatorServer interface {
+	mustEmbedUnimplementedAggregatorServer()
 }
 
-func RegisterAppServer(s grpc.ServiceRegistrar, srv AppServer) {
-	// If the following call pancis, it indicates UnimplementedAppServer was
+func RegisterAggregatorServer(s grpc.ServiceRegistrar, srv AggregatorServer) {
+	// If the following call pancis, it indicates UnimplementedAggregatorServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&App_ServiceDesc, srv)
+	s.RegisterService(&Aggregator_ServiceDesc, srv)
 }
 
-func _App_GetUser_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(AppServer).GetUser(&grpc.GenericServerStream[Req, Resp]{ServerStream: stream})
+func _Aggregator_Aggregate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AggregatorReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AggregatorServer).Aggregate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Aggregator_Aggregate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AggregatorServer).Aggregate(ctx, req.(*AggregatorReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type App_GetUserServer = grpc.BidiStreamingServer[Req, Resp]
-
-// App_ServiceDesc is the grpc.ServiceDesc for App service.
+// Aggregator_ServiceDesc is the grpc.ServiceDesc for Aggregator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var App_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "App",
-	HandlerType: (*AppServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
+var Aggregator_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Aggregator",
+	HandlerType: (*AggregatorServer)(nil),
+	Methods: []grpc.MethodDesc{
 		{
-			StreamName:    "GetUser",
-			Handler:       _App_GetUser_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
+			MethodName: "Aggregate",
+			Handler:    _Aggregator_Aggregate_Handler,
 		},
 	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "types/ptypes.proto",
 }
