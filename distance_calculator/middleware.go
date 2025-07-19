@@ -20,8 +20,9 @@ func NewLogMiddleware(next CalculatorServicer) *LogMiddleware {
 func (l *LogMiddleware) CalculateDistance(data *types.OBUData) (distance float64) {
 	defer func(start time.Time) {
 		logrus.WithFields(logrus.Fields{
-			"dist": distance,
-			"took": time.Since(start),
+			"obuID":    data.OBUID,
+			"distance": distance,
+			"took":     time.Since(start),
 		}).Info("calculate distance")
 	}(time.Now())
 	distance = l.next.CalculateDistance(data)

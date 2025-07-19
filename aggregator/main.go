@@ -33,6 +33,7 @@ func makeGRPCTransport(svc Aggregator, listenAddress string) {
 		log.Fatal(err)
 	}
 	defer l.Close()
+
 	err = grpcServer.Serve(l)
 	if err != nil {
 		log.Fatal(err)
@@ -43,7 +44,9 @@ func makeHTTPTransport(svc Aggregator, listenAddress string) {
 	fmt.Println("starting HTTP Transport on port", listenAddress)
 	http.HandleFunc("/aggregate", handleAggregateDistance(svc))
 	http.HandleFunc("/invoice", handleGetInvoice(svc))
-	http.ListenAndServe(listenAddress, nil)
+	if err := http.ListenAndServe(listenAddress, nil); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func handleAggregateDistance(svc Aggregator) http.HandlerFunc {
@@ -57,6 +60,7 @@ func handleAggregateDistance(svc Aggregator) http.HandlerFunc {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
+		writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	}
 }
 
@@ -82,7 +86,7 @@ func handleGetInvoice(svc Aggregator) http.HandlerFunc {
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) error {
-	w.WriteHeader(status)
 	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
 	return json.NewEncoder(w).Encode(v)
 }

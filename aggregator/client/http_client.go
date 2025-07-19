@@ -31,15 +31,19 @@ func (c *HTTPClient) Aggregate(ctx context.Context, aggReq *types.AggregatorReq)
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("POST", c.EndPoint, bytes.NewReader(b))
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.EndPoint, bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("non http status code 200, got %d", resp.StatusCode)
 	}

@@ -4,6 +4,9 @@ import (
 	"context"
 
 	"github.com/AyanokojiKiyotaka8/Toll-Calculator/types"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type GRPCAggregatorServer struct {
@@ -24,7 +27,14 @@ func (s *GRPCAggregatorServer) Aggregate(ctx context.Context, req *types.Aggrega
 		Unix:  req.GetUnix(),
 	}
 	if err := s.svc.AggregateDistance(dist); err != nil {
-		return nil, err
+		logrus.WithFields(logrus.Fields{
+			"obuID": dist.OBUID,
+			"value": dist.Value,
+			"unix":  dist.Unix,
+			"error": err,
+		}).Error("Failed to aggregate distance")
+		return nil, status.Errorf(codes.Internal, "aggregation failed")
 	}
+
 	return &types.AggregatorResp{}, nil
 }

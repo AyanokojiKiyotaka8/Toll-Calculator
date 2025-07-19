@@ -16,11 +16,18 @@ func main() {
 	var svc CalculatorServicer
 	svc = NewCalculatorService()
 	svc = NewLogMiddleware(svc)
-	//httpClient := client.NewHTTPClient(httpEndPoint)
-	grpcClient := client.NewGRPCClient(grpcEndPoint)
+	// TODO: Replace gRPC client with HTTP client if needed
+	// httpClient := client.NewHTTPClient(httpEndPoint)
+	grpcClient, err := client.NewGRPCClient(grpcEndPoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer grpcClient.Close()
+
 	kafkaConsumer, err := NewKafkaConsumer(kafkaTopic, svc, grpcClient)
 	if err != nil {
 		log.Fatal(err)
 	}
 	kafkaConsumer.Start()
+	kafkaConsumer.Stop()
 }

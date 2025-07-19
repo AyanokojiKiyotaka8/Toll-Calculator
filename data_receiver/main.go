@@ -6,21 +6,22 @@ import (
 
 	"github.com/AyanokojiKiyotaka8/Toll-Calculator/types"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	dr, err := NewDataReceiver()
+	receiver, err := NewDataReceiver()
 	if err != nil {
 		log.Fatal(err)
 	}
-	logrus.Info("kafka producer started")
-	http.HandleFunc("/ws", dr.handleWs)
-	http.ListenAndServe(":30000", nil)
+
+	http.HandleFunc("/ws", receiver.handleWs)
+	log.Println("WebSocket server started on :30000")
+	if err := http.ListenAndServe(":30000", nil); err != nil {
+		log.Fatal("Server failed:", err)
+	}
 }
 
 type DataReceiver struct {
-	conn *websocket.Conn
 	prod DataProducer
 }
 
@@ -41,32 +42,35 @@ func NewDataReceiver() (*DataReceiver, error) {
 }
 
 func (dr *DataReceiver) handleWs(w http.ResponseWriter, r *http.Request) {
-	u := websocket.Upgrader{
-		ReadBufferSize:  1028,
-		WriteBufferSize: 1028,
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  4096,
+		WriteBufferSize: 4096,
+		CheckOrigin:     func(r *http.Request) bool { return true },
 	}
-	conn, err := u.Upgrade(w, r, nil)
+
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("WebSocket upgrade failed:", err)
+		http.Error(w, "WebSocket upgrade failed", http.StatusBadRequest)
+		return
 	}
-	dr.conn = conn
 
-	go dr.wsReceiveLoop()
+	go dr.wsReceiveLoop(conn)
 }
 
-func (dr *DataReceiver) produceData(data *types.OBUData) error {
-	return dr.prod.ProduceData(data)
-}
+func (dr *DataReceiver) wsReceiveLoop(conn *websocket.Conn) {
+	defer conn.Close()
+	defer dr.prod.Stop()
 
-func (dr *DataReceiver) wsReceiveLoop() {
 	for {
 		var data types.OBUData
-		if err := dr.conn.ReadJSON(&data); err != nil {
-			log.Println("read error: ", err)
+		if err := conn.ReadJSON(&data); err != nil {
+			log.Println("Client disconnected or read error:", err)
 			continue
 		}
-		if err := dr.produceData(&data); err != nil {
-			log.Println("produce error: ", err)
+
+		if err := dr.prod.ProduceData(&data); err != nil {
+			log.Println("Kafka produce error:", err)
 		}
 	}
 }

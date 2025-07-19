@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/AyanokojiKiyotaka8/Toll-Calculator/aggregator/client"
@@ -11,40 +12,46 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type KafKaConsumer struct {
+type KafkaConsumer struct {
 	consumer    *kafka.Consumer
 	isRunning   bool
 	calcService CalculatorServicer
 	aggClient   client.Client
 }
 
-func NewKafkaConsumer(topic string, svc CalculatorServicer, client client.Client) (*KafKaConsumer, error) {
+func NewKafkaConsumer(topic string, svc CalculatorServicer, client client.Client) (*KafkaConsumer, error) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost",
 		"group.id":          "myGroup",
 		"auto.offset.reset": "earliest",
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create Kafka consumer: %w", err)
 	}
 
 	if err := c.SubscribeTopics([]string{topic}, nil); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to subscribe to topic %s: %w", topic, err)
 	}
-	return &KafKaConsumer{
+	return &KafkaConsumer{
 		consumer:    c,
 		calcService: svc,
 		aggClient:   client,
 	}, nil
 }
 
-func (c *KafKaConsumer) Start() {
+func (c *KafkaConsumer) Start() {
 	logrus.Info("kafka consumer started")
 	c.isRunning = true
 	c.consumeMessages()
 }
 
-func (c *KafKaConsumer) consumeMessages() {
+func (c *KafkaConsumer) Stop() {
+	c.isRunning = false
+	c.consumer.Close()
+	logrus.Info("Kafka consumer stopped")
+}
+
+func (c *KafkaConsumer) consumeMessages() {
 	for c.isRunning {
 		msg, err := c.consumer.ReadMessage(-1)
 		if err != nil {
@@ -64,7 +71,10 @@ func (c *KafKaConsumer) consumeMessages() {
 			Unix:  time.Now().UnixNano(),
 		}
 		if err := c.aggClient.Aggregate(context.Background(), req); err != nil {
-			logrus.Errorf("aggregate error: %s", err)
+			logrus.WithFields(logrus.Fields{
+				"obuID": data.OBUID,
+				"error": err,
+			}).Error("Failed to aggregate distance data")
 			continue
 		}
 	}

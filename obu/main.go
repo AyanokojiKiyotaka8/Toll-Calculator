@@ -11,7 +11,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const wsEndpoint = "ws://localhost:30000/ws"
+const (
+	wsEndpoint       = "ws://localhost:30000/ws"
+	numSimulatedOBUs = 10
+)
 
 var (
 	sendInterval = time.Second
@@ -38,11 +41,20 @@ func genOBUIDs(n int) []int {
 
 func main() {
 	fmt.Println("running obu")
-	conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)
-	if err != nil {
+	if err := run(); err != nil {
 		log.Fatal(err)
 	}
-	ids := genOBUIDs(10)
+}
+
+func run() error {
+	conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)
+	if err != nil {
+		return fmt.Errorf("failed to connect to WebSocket: %w", err)
+	}
+	defer conn.Close()
+
+	ids := genOBUIDs(numSimulatedOBUs)
+
 	for {
 		for _, id := range ids {
 			lat, long := genLatLong()
@@ -51,9 +63,10 @@ func main() {
 				Lat:   lat,
 				Long:  long,
 			}
-			fmt.Println(data)
+			log.Printf("Sending OBU data: %+v", data)
 			if err := conn.WriteJSON(data); err != nil {
-				log.Fatal(err)
+				log.Printf("WebSocket write error: %v", err)
+				continue
 			}
 		}
 		time.Sleep(sendInterval)
